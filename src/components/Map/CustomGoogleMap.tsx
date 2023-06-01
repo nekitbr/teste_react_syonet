@@ -1,21 +1,32 @@
 'use client'
 
-import type { Dispatch, MutableRefObject, Ref, SetStateAction } from 'react'
+import type { MutableRefObject } from 'react'
 import { forwardRef, useImperativeHandle } from 'react'
 import { useState, useMemo, useRef, useEffect } from 'react'
-import { GoogleMap, Marker, MarkerClusterer } from '@react-google-maps/api'
+import { GoogleMap, Marker } from '@react-google-maps/api'
 import type { GeocodeResult } from 'use-places-autocomplete'
 
 type LatLngLiteral = google.maps.LatLngLiteral
 type MapOptions = google.maps.MapOptions
+type GeocoderResult = google.maps.GeocoderResult
 
 export namespace iCustomGoogleMap {
+  export enum ZoomLevel {
+    world = 1,
+    continent = 5,
+    city = 10,
+    default = 13,
+    street = 15,
+    construction = 20,
+  }
+
   export interface CustomMarker {
     position: LatLngLiteral
     icon?: string
     label?: string
     description?: string
     place_id?: string
+    zoom?: ZoomLevel
   }
 
   export interface ForwardedRef {
@@ -35,6 +46,16 @@ export namespace iCustomGoogleMap {
   export interface props {
     onNewMarker?: (newMarker: CustomMarker | null, allMarkers: CustomMarker[], action: NewMarkerAction) => void
   }
+}
+
+// TODO: WIP
+export function getGeocodeZoom(geocode?: GeocoderResult) {
+  if (geocode?.types.includes('continent')) return iCustomGoogleMap.ZoomLevel.continent
+  if (!geocode) return iCustomGoogleMap.ZoomLevel.default
+  if (geocode.geometry.location_type === google.maps.GeocoderLocationType.ROOFTOP) return iCustomGoogleMap.ZoomLevel.street
+  if (geocode.geometry.location_type === google.maps.GeocoderLocationType.RANGE_INTERPOLATED) return iCustomGoogleMap.ZoomLevel.street
+  if (geocode.geometry.location_type === google.maps.GeocoderLocationType.APPROXIMATE) return iCustomGoogleMap.ZoomLevel.city
+  if (geocode.geometry.location_type === google.maps.GeocoderLocationType.GEOMETRIC_CENTER) return iCustomGoogleMap.ZoomLevel.default
 }
 
 export default forwardRef<iCustomGoogleMap.ForwardedRef | undefined, iCustomGoogleMap.props>(function CustomGoogleMap({ onNewMarker }, ref) {
@@ -137,10 +158,10 @@ export default forwardRef<iCustomGoogleMap.ForwardedRef | undefined, iCustomGoog
   return (
     <GoogleMap
       onLoad={onLoad}
-      zoom={15}
       onClick={handleMapClick}
       center={center}
       mapContainerClassName="h-full w-full"
+      zoom={iCustomGoogleMap.ZoomLevel.default}
       options={options}
     >
       {selectedMarker && (

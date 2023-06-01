@@ -4,6 +4,7 @@ import usePlacesAutocomplete, { getGeocode, getLatLng } from 'use-places-autocom
 import { Combobox, ComboboxInput, ComboboxPopover, ComboboxList, ComboboxOption } from '@reach/combobox'
 import '@reach/combobox/styles.css'
 import type { iCustomGoogleMap } from './CustomGoogleMap'
+import { getGeocodeZoom } from './CustomGoogleMap'
 import { useEffect, useRef } from 'react'
 
 interface PlacesProps {
@@ -43,12 +44,13 @@ export default function LocationSelect({ onSelect }: PlacesProps) {
       description: valueData?.structured_formatting.secondary_text,
       label: valueData?.structured_formatting.main_text,
       place_id: valueData?.place_id,
+      zoom: getGeocodeZoom(results[0]),
     })
   }
 
   return (
     <Combobox
-      className="m-3"
+      className="mr-3"
       onSelect={handleSelect}
     >
       <ComboboxInput
