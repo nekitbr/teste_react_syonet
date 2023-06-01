@@ -6,7 +6,7 @@ import LocationSelect from '@/components/Map/LocationSelect'
 import MarkerList from '@/components/Map/MarkerList'
 import Icon from '@/components/layout/Icon'
 import Row from '@/components/layout/Row'
-import { Collapse, IconButton, Typography } from '../components/material-tailwind/components'
+import { Collapse, Typography } from '../components/material-tailwind/components'
 import { useLoadScript } from '@react-google-maps/api'
 import { useRef, useState } from 'react'
 
@@ -21,12 +21,126 @@ export default function Home() {
 
   const [selectedMarker, setSelectedMarker] = useState<iCustomGoogleMap.CustomMarker>()
   const mapRef = useRef<iCustomGoogleMap.ForwardedRef>()
-  const [markers, setMarkers] = useState<iCustomGoogleMap.CustomMarker[]>([])
+  const [markers, setMarkers] = useState<iCustomGoogleMap.CustomMarker[]>([
+    {
+      position: {
+        lat: 6.42375,
+        lng: -66.58972,
+      },
+      label: 'Venezuela',
+      place_id: 'ChIJAdjLNstTKIwR003VfFjyoNw',
+    },
+    {
+      position: {
+        lat: 6.42375,
+        lng: -66.58973,
+      },
+      label: 'Venezuela',
+      place_id: 'ChIJAdjLNstTKIwR003VfFjyoNw',
+    },
+    {
+      position: {
+        lat: 6.42375,
+        lng: -66.58974,
+      },
+      label: 'Venezuela',
+      place_id: 'ChIJAdjLNstTKIwR003VfFjyoNw',
+    },
+    {
+      position: {
+        lat: 6.42375,
+        lng: -66.58975,
+      },
+      label: 'Venezuela',
+      place_id: 'ChIJAdjLNstTKIwR003VfFjyoNw',
+    },
+    {
+      position: {
+        lat: 6.42375,
+        lng: -66.58976,
+      },
+      label: 'Venezuela',
+      place_id: 'ChIJAdjLNstTKIwR003VfFjyoNw',
+    },
+    {
+      position: {
+        lat: 6.42375,
+        lng: -66.58977,
+      },
+      label: 'Venezuela',
+      place_id: 'ChIJAdjLNstTKIwR003VfFjyoNw',
+    },
+    {
+      position: {
+        lat: 6.42375,
+        lng: -66.58978,
+      },
+      label: 'Venezuela',
+      place_id: 'ChIJAdjLNstTKIwR003VfFjyoNw',
+    },
+    {
+      position: {
+        lat: 6.42375,
+        lng: -66.58979,
+      },
+      label: 'Venezuela',
+      place_id: 'ChIJAdjLNstTKIwR003VfFjyoNw',
+    },
+    {
+      position: {
+        lat: 6.42375,
+        lng: -66.58913,
+      },
+      label: 'Venezuela',
+      place_id: 'ChIJAdjLNstTKIwR003VfFjyoNw',
+    },
+    {
+      position: {
+        lat: 6.42375,
+        lng: -66.58923,
+      },
+      label: 'Venezuela',
+      place_id: 'ChIJAdjLNstTKIwR003VfFjyoNw',
+    },
+    {
+      position: {
+        lat: 6.42375,
+        lng: -66.58933,
+      },
+      label: 'Venezuela',
+      place_id: 'ChIJAdjLNstTKIwR003VfFjyoNw',
+    },
+    {
+      position: {
+        lat: 6.42375,
+        lng: -66.58943,
+      },
+      label: 'Venezuela',
+      place_id: 'ChIJAdjLNstTKIwR003VfFjyoNw',
+    },
+    {
+      position: {
+        lat: 6.42375,
+        lng: -66.58953,
+      },
+      label: 'Venezuela',
+      place_id: 'ChIJAdjLNstTKIwR003VfFjyoNw',
+    },
+    {
+      position: {
+        lat: 6.42375,
+        lng: -66.58963,
+      },
+      label: 'Venezuela',
+      place_id: 'ChIJAdjLNstTKIwR003VfFjyoNw',
+    },
+  ])
 
   function handleHighlightMarker(marker: iCustomGoogleMap.CustomMarker) {
     setSelectedMarker(marker)
     mapRef.current?.setSelectedMarker(marker)
     mapRef.current?.mapRef.current?.panTo(marker.position)
+    mapRef.current?.mapRef.current?.setZoom(marker.zoom as number)
   }
 
   function handleNewMarkers(
@@ -54,10 +168,15 @@ export default function Home() {
 
   if (isLoaded)
     return (
-      <div className="text-white bg-blue-gray-900 flex min-w-full h-full w-full min-h-full">
-        <div className="w-1/4 p-4 bg-blue-gray-800">
-          <h1>Add new markers:</h1>
-          <Row>
+      <div className="max-h-screen text-white bg-blue-gray-900 flex">
+        <div className="p-4 bg-blue-gray-800">
+          <Typography
+            className="mb-1"
+            variant="h6"
+          >
+            Add new markers:
+          </Typography>
+          <Row className="mb-4">
             <LocationSelect onSelect={handleHighlightMarker} />
             <Icon
               button
@@ -68,8 +187,14 @@ export default function Home() {
               color="blue-gray"
             />
           </Row>
-          <div>
+          <div className="overflow-auto">
             <Collapse open={markers.length > 0}>
+              <Typography
+                className="mb-1"
+                variant="h6"
+              >
+                Your Markers
+              </Typography>
               <MarkerList
                 selection
                 selectedMarker={selectedMarker}
@@ -80,7 +205,7 @@ export default function Home() {
             </Collapse>
           </div>
         </div>
-        <div className="w-3/4 min-h-full">
+        <div className="h-screen w-screen">
           <CustomGoogleMap
             onNewMarker={handleNewMarkers}
             ref={mapRef}
