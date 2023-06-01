@@ -1,7 +1,6 @@
 import './globals.css'
 import { ThemeProvider } from '../components/material-tailwind/components'
 import { Inter } from 'next/font/google'
-import Script from 'next/script'
 
 const inter = Inter({ subsets: ['latin'] })
 
