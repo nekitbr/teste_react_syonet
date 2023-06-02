@@ -61,7 +61,7 @@ export default function EditMarkerModal({ editMarker, setEditMarker, onYes, open
             <Input
               label="Title"
               className="self-center"
-              value={editMarker?.label}
+              value={editMarker?.label ?? ''}
               onChange={(event) => {
                 event.stopPropagation()
                 if (!editMarker) return
@@ -72,7 +72,7 @@ export default function EditMarkerModal({ editMarker, setEditMarker, onYes, open
             <Input
               label="Description"
               className="self-center"
-              value={editMarker?.description}
+              value={editMarker?.description ?? ''}
               onChange={(event) => {
                 event.stopPropagation()
                 if (!editMarker) return
