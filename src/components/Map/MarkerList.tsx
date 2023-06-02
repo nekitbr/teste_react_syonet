@@ -40,14 +40,13 @@ export default function MarkerList({ className, selectedMarker, onClickIcon, onC
                   if (onClickIcon) onClickIcon(item)
                 }}
               >
-                {/* <Icon iconName={item?.icon ?? 'location_on'} /> */}
-                <Icon iconName={'location_on'} />
+                {typeof item?.icon === 'string' ? <img src={item?.icon} /> : <Icon iconName={item?.icon ?? 'location_on'} />}
               </IconButton>
             </ListItemPrefix>
 
             <Column>
-              <Typography variant="lead">{item.label}</Typography>
-              <Typography variant="small">{item.description}</Typography>
+              <Typography variant="lead">{item.label ?? ''}</Typography>
+              <Typography variant="small">{item.description ?? ''}</Typography>
             </Column>
 
             {onDelete ? (
