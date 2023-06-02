@@ -5,25 +5,40 @@ import { Combobox, ComboboxInput, ComboboxPopover, ComboboxList, ComboboxOption 
 import '@reach/combobox/styles.css'
 import type { iCustomGoogleMap } from './CustomGoogleMap'
 import { getGeocodeZoom } from './CustomGoogleMap'
-import { useEffect, useRef } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 interface PlacesProps {
   onSelect: (position: iCustomGoogleMap.CustomMarker) => void
+  mode: 'address' | 'ltnlng'
 }
 
-export default function LocationSelect({ onSelect }: PlacesProps) {
+export default function LocationSelect({ mode, onSelect }: PlacesProps) {
   const {
     ready,
     value,
     setValue,
     suggestions: { status, data },
-    clearSuggestions,
+    clearSuggestions: _clearSuggestions,
   } = usePlacesAutocomplete()
 
+  const [suggestions, setSuggestions] = useState<google.maps.places.AutocompletePrediction[]>([])
+  const Geocoder = useMemo<google.maps.Geocoder>(() => new google.maps.Geocoder(), [])
   const dataOptions = useRef<google.maps.places.AutocompletePrediction[]>([])
 
+  function clearSuggestions() {
+    _clearSuggestions()
+    setSuggestions([])
+  }
+
   useEffect(() => {
-    if (status === 'OK') dataOptions.current = data
+    if (!data.length) return
+
+    if (status === 'OK') {
+      dataOptions.current = data
+      setSuggestions(data)
+    } else {
+      clearSuggestions()
+    }
   }, [data])
 
   async function handleSelect(value: string) {
@@ -48,6 +63,30 @@ export default function LocationSelect({ onSelect }: PlacesProps) {
     })
   }
 
+  async function handleLatLngSearch(value: string) {
+    try {
+      const [lat, lng] = value.split(',').map((e) => Number(e))
+
+      if (!lat || !lng || isNaN(lat) || isNaN(lng)) throw new Error('invalid code')
+
+      const { results } = await Geocoder.geocode({ location: { lat, lng } })
+
+      const result = results[0]
+
+      dataOptions.current = [
+        {
+          description: result.formatted_address,
+          matched_substrings: [],
+          place_id: result.place_id,
+          terms: [],
+          structured_formatting: { main_text: result.formatted_address, secondary_text: '', main_text_matched_substrings: [] },
+          types: [],
+        },
+      ]
+      setSuggestions(dataOptions.current)
+    } catch (e) {}
+  }
+
   return (
     <Combobox
       className="mr-3"
@@ -55,22 +94,24 @@ export default function LocationSelect({ onSelect }: PlacesProps) {
     >
       <ComboboxInput
         value={value}
-        onChange={(e) => setValue(e.target.value)}
+        onChange={(e) => {
+          setValue(e.target.value, mode === 'address')
+          if (mode === 'ltnlng') handleLatLngSearch(e.target.value)
+        }}
         disabled={!ready}
         className="text-black w-full p-2"
-        placeholder="Search office address"
+        placeholder={`${mode === 'address' ? 'Search address' : '-27.398990, -53.467005'}`}
       />
       <ComboboxPopover>
         <ComboboxList>
-          {status === 'OK' &&
-            data.map((a) => {
-              return (
-                <ComboboxOption
-                  key={a.place_id}
-                  value={a.description}
-                />
-              )
-            })}
+          {suggestions.map((a) => {
+            return (
+              <ComboboxOption
+                key={a.place_id}
+                value={a.description}
+              />
+            )
+          })}
         </ComboboxList>
       </ComboboxPopover>
     </Combobox>

@@ -5,6 +5,7 @@ import { forwardRef, useImperativeHandle } from 'react'
 import { useState, useMemo, useRef, useEffect } from 'react'
 import { GoogleMap, Marker } from '@react-google-maps/api'
 import type { GeocodeResult } from 'use-places-autocomplete'
+import type { color } from '@material-tailwind/react/types/components/button'
 
 type LatLngLiteral = google.maps.LatLngLiteral
 type MapOptions = google.maps.MapOptions
@@ -27,6 +28,7 @@ export namespace iCustomGoogleMap {
     description?: string
     place_id?: string
     zoom?: ZoomLevel
+    iconColor?: color
   }
 
   export interface ForwardedRef {
@@ -134,12 +136,14 @@ export default forwardRef<iCustomGoogleMap.ForwardedRef | undefined, iCustomGoog
   }
 
   function handleMarkerDragStart(event: google.maps.MapMouseEvent) {
-    if (event.latLng) movingMarker.current = { position: event.latLng.toJSON() }
+    const position = event.latLng?.toJSON()
+
+    if (position) movingMarker.current = markers.find((e) => e.position.lat === position.lat && e.position.lng === position.lng) ?? { position }
   }
 
   function handleMarkerDragEnd(event: google.maps.MapMouseEvent) {
     if (!event.latLng || !movingMarker.current) return
-    updateMarker(movingMarker.current, { position: event.latLng.toJSON() })
+    updateMarker(movingMarker.current, { ...movingMarker.current, position: event.latLng.toJSON() })
     movingMarker.current = undefined
   }
 
@@ -171,17 +175,18 @@ export default forwardRef<iCustomGoogleMap.ForwardedRef | undefined, iCustomGoog
           position={selectedMarker.position}
         />
       )}
-      {markers.map((marker) => (
-        // TODO: deixar modal aberta mostrando descrição do local e algo custom do usuario
-        <Marker
-          key={`${marker.position.lng}${marker.position.lat}`}
-          position={marker.position}
-          onDragStart={handleMarkerDragStart}
-          onDragEnd={handleMarkerDragEnd}
-          icon={marker.icon}
-          draggable
-        />
-      ))}
+      {markers.map((marker) => {
+        return (
+          <Marker
+            key={`${marker.position.lng}${marker.position.lat}`}
+            position={marker.position}
+            onDragStart={handleMarkerDragStart}
+            onDragEnd={handleMarkerDragEnd}
+            icon={marker.icon}
+            draggable
+          />
+        )
+      })}
     </GoogleMap>
   )
 })
