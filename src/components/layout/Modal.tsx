@@ -10,18 +10,25 @@ interface ModalProps {
   onNo?: () => void
   children: ReactElement
   title?: ReactElement | string
+  className?: string
 }
 
-export default function Modal({ open, handleOpen, onYes, onNo, children, title }: ModalProps) {
+export default function Modal({ className, open, handleOpen, onYes, onNo, children, title }: ModalProps) {
   return (
     <Dialog
+      className={className}
       open={open}
       handler={handleOpen}
       size="lg"
     >
       {title && <DialogHeader>{title}</DialogHeader>}
-      <DialogBody divider={!!title}>{children}</DialogBody>
-      <DialogFooter>
+      <DialogBody
+        className="p-2 md:p-4"
+        divider={!!title}
+      >
+        {children}
+      </DialogBody>
+      <DialogFooter className="gap-3">
         {!onYes && !onNo && (
           <Button
             variant="filled"
@@ -33,6 +40,19 @@ export default function Modal({ open, handleOpen, onYes, onNo, children, title }
             className="mr-1"
           >
             <span>Ok</span>
+          </Button>
+        )}
+        {onYes && (
+          <Button
+            variant="gradient"
+            color="green"
+            onClick={(event) => {
+              event.stopPropagation()
+              handleOpen(false)
+              onYes()
+            }}
+          >
+            <span>Save</span>
           </Button>
         )}
         {onNo && (
@@ -47,19 +67,6 @@ export default function Modal({ open, handleOpen, onYes, onNo, children, title }
             className="mr-1"
           >
             <span>Cancel</span>
-          </Button>
-        )}
-        {onYes && (
-          <Button
-            variant="gradient"
-            color="blue"
-            onClick={(event) => {
-              event.stopPropagation()
-              handleOpen(false)
-              onYes()
-            }}
-          >
-            <span>Confirm</span>
           </Button>
         )}
       </DialogFooter>
