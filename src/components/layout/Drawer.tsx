@@ -31,10 +31,11 @@ export default function Drawer<T>({ children, items: iconItems, defaultIcon, onC
         {open ? (
           children
         ) : iconItems ? (
-          iconItems.map((item) => {
+          iconItems.map((item, index) => {
             if (!item.icon)
               return (
                 <IconButton
+                  key={index}
                   variant="text"
                   color={item.iconColor}
                   onClick={() => onClickIconItem(item as T)}
@@ -45,6 +46,7 @@ export default function Drawer<T>({ children, items: iconItems, defaultIcon, onC
             if (typeof item.icon === 'string')
               return (
                 <IconButton
+                  key={index}
                   variant="text"
                   onClick={() => onClickIconItem(item as T)}
                 >
@@ -53,6 +55,7 @@ export default function Drawer<T>({ children, items: iconItems, defaultIcon, onC
               )
             return (
               <IconButton
+                key={index}
                 variant="text"
                 color={item.iconColor}
                 onClick={() => onClickIconItem(item as T)}
